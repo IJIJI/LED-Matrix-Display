@@ -18,51 +18,6 @@ int delayTime=200;  // Delay between Frames
 // TODO implement a character define
 // #define characters = 7
 
-// different frames for swipe animations vv
-
-byte frames[] =
-{
-  B10000000,
-  B01000000,
-  B00100000,
-  B00010000,
-  B00001000,
-  B00000100,
-#ifndef thin
-  B00000010,
-  B00000001,
-#endif
-  B00000000
-};
-
-byte sideFillFrames[]{
-  B10000000,
-  B11000000,
-  B11100000,
-  B11110000,
-  B11111000,
-  B11111100,
-#ifndef thin
-  B11111110,
-  B11111111,
-#endif
-  B01111111,
-  B00111111,
-  B00011111,
-  B00001111,
-  B00000111,
-#ifndef thin
-  B00000011,
-  B00000001,
-#endif
-  B00000000
-};
-
-
-//  Font arrays mk2
-
-// char font[fontLength] = {'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.!?*#'};
-
 
 
 void setup()
@@ -75,54 +30,13 @@ void setup()
     
     
   }
-  
+  Serial.begin(9600);
   pinMode(switchPin, INPUT_PULLUP);
 }
 
 
 // different swipe animations vv
 
-void ledCycle(){
-  for (int x = 0; x < 8; x++){
-    for (int y = 0; y < sizeof(frames); y++){
-      
-      for (int z = 0; z < dispAmount; z++){
-        lc.setRow(z,x,frames[y]);
-      }
-      
-      delay(delayTime);
-    }
-  }
-}
-
-void sideFill(){
-  for (int y = 0; y < sizeof(sideFillFrames); y++){
-    for (int x = 0; x < 8; x++){
-      
-      for (int z = 0; z < dispAmount; z++){
-        lc.setRow(z,x,sideFillFrames[y]);
-      }
-    }
-    delay(delayTime * 2);
-  }
-  
-}
-
-void fill(){
-  for (int x = 0; x < 8; x++){
-    for (int z = 0; z < dispAmount; z++){
-      
-      lc.setRow(z,x,255);
-    }
-    delay(delayTime * 2);
-  }
-  for (int x = 0; x < 8; x++){
-    for (int z = 0; z < dispAmount; z++){
-      lc.setRow(z,x,0);
-    }
-    delay(delayTime * 2);
-  }
-}
 void white(){
   for (int x = 0; x < 8; x++){
     for (int z = 0; z < dispAmount; z++){
@@ -136,7 +50,7 @@ void white(){
 // ? Improved Alphabet()
 
 void fontCycle(){
-  for (int i = 0; i < int(fontLength); i++){
+  for (int i = 0; i < fontLength; i++){
     for (int x = 0; x < 8; x++){
       for (int z = 0; z < dispAmount; z++){
         lc.setRow(z,x,font[i][x]);
@@ -152,12 +66,29 @@ void fontCycle(){
 void loop()
 {
   if (digitalRead(switchPin) == HIGH){
-    ledCycle();
-    fill();
-    sideFill();
-  }
-  else{
     fontCycle();
     white();
+  }
+  else{
+    
+    char inData = ' ';
+    while (Serial.available() > 0) {
+      inData = char(Serial.read());
+      delay(5);
+      Serial.println(inData);
+
+      for (int y = 0; y < fontLength; y++){
+        if (inData == fontContent[y]){
+          for (int x = 0; x < 8; x++){
+            for (int z = 0; z < dispAmount; z++){
+              lc.setRow(z,x,font[y][x]);
+            }
+          }
+          delay(600);
+        }
+      }
+    }
+
+
   }
 }
