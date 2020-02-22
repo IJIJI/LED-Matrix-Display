@@ -1,22 +1,21 @@
 
 #include "Arduino.h"
 #include "LedControl.h"
+#include "matrixDisplay.h"
 #include "font.h"
 
 #define thin
 
 
-#define dispAmount 1 // amount of displays
+#define dispAmount 30 // amount of displays
 #define switchPin 2
 
 
 
-LedControl lc=LedControl(7,5,6, dispAmount - 1);  // Pins: DIN,CLK,CS, # of Display connected
+LedControl lc=LedControl(11,13,8, dispAmount - 1);  // Pins: DIN,CLK,CS, # of Display connected
 
-int delayTime=200;  // Delay between Frames
+#define delayTime 600  // Delay between Frames
 
-// TODO implement a character define
-// #define characters = 7
 
 
 
@@ -25,7 +24,7 @@ void setup()
   for(int x = 0; x < dispAmount; x++){
     
     lc.shutdown(x,false);  // Wake up displays
-    lc.setIntensity(x,5);  // Set intensity levels
+    lc.setIntensity(x,15);  // Set intensity levels
     lc.clearDisplay(x);  // Clear Displays
     
     
@@ -84,11 +83,9 @@ void loop()
               lc.setRow(z,x,font[y][x]);
             }
           }
-          delay(600);
+          delay(delayTime);
         }
       }
     }
-
-
   }
 }
