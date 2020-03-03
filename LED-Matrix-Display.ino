@@ -1,7 +1,7 @@
 
 #include "Arduino.h"
 #include "LedControl.h"
-#include "matrixDisplay.h"
+// #include "matrixDisplay.h"
 #include "font.h"
 
 #define thin
