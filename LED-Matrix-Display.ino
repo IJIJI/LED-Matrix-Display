@@ -35,7 +35,7 @@ void setup()
   matrix.begin();
 
 
-  matrix.setTextAlignment(PA_CENTER);
+  matrix.setTextAlignment(PA_LEFT);
 }
 
 
@@ -65,18 +65,21 @@ int readSwitches(){
 
 void loop()
 {
+  if (readSwitches() == 0){
 
-  if (Serial.available()){
-    inData = "";
-    while (Serial.available() > 0) {
-      inData += char(Serial.read());
-      delay(5);
-    
+    if (Serial.available()){
+      inData = "";
+      while (Serial.available() > 0) {
+        inData += char(Serial.read());
+        delay(5);
+      
+      }
+      Serial.println();
+      Serial.println(inData);
+
+      // matrix.displayText(inData, PA_CENTER, 0, 0, PA_PRINT, PA_NO_EFFECT);
+      matrix.print(inData);
     }
-    Serial.println();
-    Serial.println(inData);
-
-    // matrix.displayText(inData, PA_CENTER, 0, 0, PA_PRINT, PA_NO_EFFECT);
-    matrix.print(inData);
   }
+
 }
