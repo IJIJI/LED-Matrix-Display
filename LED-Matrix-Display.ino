@@ -5,21 +5,28 @@
 #include <MD_MAX72xx.h>
 #include <SPI.h>
 
-#define dispAmount 30 // amount of displays
+String words[] = {"Hello", "World"};
+
+
+
 
 #define switch1 6
 #define switch2 5
 #define switch3 4
 
+
+// Define the number of devices we have in the chain and the hardware interface
+// NOTE: These pin numbers will probably not work with your hardware and may
+// need to be adapted
+#define HARDWARE_TYPE MD_MAX72XX::PAROLA_HW
+#define MAX_DEVICES 3
+
 #define CLK_PIN   13
 #define DATA_PIN  11
 #define CS_PIN    8
 
-// #define HARDWARE_TYPE MD_MAX72XX::PAROLA_HW
-#define HARDWARE_TYPE MD_MAX72XX::FC16_HW 
-
 // Hardware SPI connection
-MD_Parola matrix = MD_Parola(HARDWARE_TYPE, CS_PIN, dispAmount);
+MD_Parola matrix = MD_Parola(HARDWARE_TYPE, CS_PIN, MAX_DEVICES);
 // Arbitrary output pins
 // MD_Parola P = MD_Parola(HARDWARE_TYPE, DATA_PIN, CLK_PIN, CS_PIN, MAX_DEVICES);
 
@@ -32,10 +39,25 @@ void setup()
   pinMode(switch2, INPUT_PULLUP);
   pinMode(switch3, INPUT_PULLUP);
 
-  matrix.begin();
+  
+  
+  matrix.begin(1);
+  matrix.setTextAlignment(PA_CENTER);
+  matrix.setSpeed(0);
+  matrix.setPause(0);
+  matrix.setTextEffect(PA_PRINT, PA_NO_EFFECT);
+  matrix.setZoneEffect(0, true, PA_FLIP_LR);
 
+  String y = "";
+  for (int x = 0; x < MAX_DEVICES; x++){
+    y += x+1;
+    matrix.print(y);
+    delay(300);
+  }
+  delay(1000);
+  
 
-  matrix.setTextAlignment(PA_LEFT);
+  matrix.print("");
 }
 
 
@@ -60,25 +82,23 @@ int readSwitches(){
 
 
 
-
 // Cycle through functions VV
 
 void loop()
 {
-  if (readSwitches() == 0){
+  
+  if(digitalRead(switch1) == LOW){
+    for(int x = 0; x < 2; x++){
+      matrix.print(words[x]);
+      delay(4000);
+    }
+  }
+  else {
 
     if (Serial.available()){
-      inData = "";
-      while (Serial.available() > 0) {
-        inData += char(Serial.read());
-        delay(5);
-      
-      }
-      Serial.println();
-      Serial.println(inData);
-
-      // matrix.displayText(inData, PA_CENTER, 0, 0, PA_PRINT, PA_NO_EFFECT);
-      matrix.print(inData);
+      inData = Serial.readStringUntil('\n');
+      Serial.println("\nPrinting: " + inData);
+      matrix.print(inData.substring(0,inData.length() - 1) );
     }
   }
 
