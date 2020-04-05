@@ -4,15 +4,18 @@
 #include <MD_Parola.h>
 #include <MD_MAX72xx.h>
 #include <SPI.h>
+#include <RF24.h>
 
 String words[] = {"Hello", "World"};
-
-
 
 
 #define switch1 6
 #define switch2 5
 #define switch3 4
+
+RF24 radio(10, 9); // CE, CSN
+
+const int RFaddress = 0xF5B3FCA46F;
 
 
 // Define the number of devices we have in the chain and the hardware interface
@@ -47,6 +50,11 @@ void setup()
   matrix.setPause(0);
   matrix.setTextEffect(PA_PRINT, PA_NO_EFFECT);
   matrix.setZoneEffect(0, true, PA_FLIP_LR);
+
+  radio.begin();
+  radio.openReadingPipe(0, RFaddress);
+  radio.setPALevel(RF24_PA_MIN);
+  radio.startListening();
 
   String y = "";
   for (int x = 0; x < MAX_DEVICES; x++){
@@ -87,19 +95,26 @@ int readSwitches(){
 void loop()
 {
   
-  if(digitalRead(switch1) == LOW){
-    for(int x = 0; x < 2; x++){
-      matrix.print(words[x]);
-      delay(4000);
-    }
-  }
-  else {
+  // if(digitalRead(switch1) == LOW){
+  //   for(int x = 0; x < 2; x++){
+  //     matrix.print(words[x]);
+  //     delay(4000);
+  //   }
+  // }
+  // else {
 
-    if (Serial.available()){
-      inData = Serial.readStringUntil('\n');
-      Serial.println("\nPrinting: " + inData);
-      matrix.print(inData.substring(0,inData.length() - 1) );
-    }
+  //   if (Serial.available()){
+  //     inData = Serial.readStringUntil('\n');
+  //     Serial.println("\nPrinting: " + inData);
+  //     matrix.print(inData.substring(0,inData.length() - 1) );
+  //   }
+  // }
+
+  if (radio.available()) {
+    char text[32] = "";
+    radio.read(&text, sizeof(text));
+    Serial.println(text);
+    matrix.print(text);
   }
 
 }
