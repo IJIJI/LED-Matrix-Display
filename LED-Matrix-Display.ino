@@ -15,7 +15,7 @@ String words[] = {"Hello", "World"};
 
 RF24 radio(10, 9); // CE, CSN
 
-const int RFaddress = 0xF5B3FCA46F;
+const int RFaddress = 0x001;
 
 
 // Define the number of devices we have in the chain and the hardware interface
@@ -84,7 +84,7 @@ int readSwitches(){
   if (digitalRead(switch3) == LOW){
     mode += 4;
   }
-  
+  return mode;
   
 }
 
@@ -94,27 +94,32 @@ int readSwitches(){
 
 void loop()
 {
-  
-  // if(digitalRead(switch1) == LOW){
-  //   for(int x = 0; x < 2; x++){
-  //     matrix.print(words[x]);
-  //     delay(4000);
-  //   }
-  // }
-  // else {
-
-  //   if (Serial.available()){
-  //     inData = Serial.readStringUntil('\n');
-  //     Serial.println("\nPrinting: " + inData);
-  //     matrix.print(inData.substring(0,inData.length() - 1) );
-  //   }
-  // }
-
-  if (radio.available()) {
-    char text[32] = "";
-    radio.read(&text, sizeof(text));
-    Serial.println(text);
-    matrix.print(text);
+  if (readSwitches() == 0){
+    if (radio.available()) {
+      char text[99] = "";
+      radio.read(&text, sizeof(text));
+      Serial.println(text);
+      matrix.print(text);
+    }
   }
+
+  else if (readSwitches() == 1){
+
+    if (Serial.available()){
+      inData = Serial.readStringUntil('\n');
+      Serial.println("\nPrinting: " + inData);
+      matrix.print(inData.substring(0,inData.length() - 1) );
+    }
+  }
+
+  else if(readSwitches() == 2){
+    for(int x = 0; x < 2; x++){
+      matrix.print(words[x]);
+      delay(4000);
+    }
+  }
+  
+
+  
 
 }
