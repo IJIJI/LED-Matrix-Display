@@ -33,6 +33,9 @@ MD_Parola matrix = MD_Parola(HARDWARE_TYPE, CS_PIN, MAX_DEVICES);
 // Arbitrary output pins
 // MD_Parola P = MD_Parola(HARDWARE_TYPE, DATA_PIN, CLK_PIN, CS_PIN, MAX_DEVICES);
 
+uint32_t startTime;
+uint32_t time;
+
 String inData;
 
 void setup()
@@ -66,6 +69,8 @@ void setup()
   
 
   matrix.print("");
+
+  startTime = millis();
 }
 
 
@@ -117,6 +122,11 @@ void loop()
       matrix.print(words[x]);
       delay(4000);
     }
+  }
+
+  else if (readSwitches() == 3){
+    time = round((millis() - startTime) / 1000);
+    matrix.print(time);
   }
   
 
